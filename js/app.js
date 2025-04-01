@@ -16,7 +16,7 @@ const DEFAULT_STORAGE = {
 // App configuration
 const APP_NAME = "FuckPost";
 const APP_WEBSITE = window.location.origin;
-const APP_REDIRECT_URI = window.location.href;
+const APP_REDIRECT_URI = window.location.href.split("?")[0];
 const APP_SCOPES = "read write";
 
 // App state
@@ -192,6 +192,8 @@ async function exchangeCodeForToken(code) {
       throw new Error("Missing authentication information");
     }
 
+    console.log("ikuzo");
+    console.log(APP_REDIRECT_URI);
     const response = await fetch(`https://${instance}/oauth/token`, {
       method: "POST",
       headers: {
