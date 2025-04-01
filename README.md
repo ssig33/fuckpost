@@ -2,6 +2,10 @@
 
 A minimal Mastodon client for posting with Markdown support. Built with pure HTML, CSS, and JavaScript.
 
+## Live Demo
+
+You can use FuckPost directly from: https://ssig33.github.io/fuckpost/
+
 ## Features
 
 - Direct access token authentication with Mastodon instances
