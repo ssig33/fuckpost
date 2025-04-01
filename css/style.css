@@ -1,0 +1,299 @@
+/* Reset CSS */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Base styles - Light Mode */
+:root {
+    --bg-color: #f8f8f8;
+    --text-color: #333;
+    --border-color: #ddd;
+    --primary-color: #2b90d9;
+    --primary-hover: #1a80c9;
+    --container-bg: white;
+    --code-bg: #f5f5f5;
+    --blockquote-color: #666;
+    --table-header-bg: #f5f5f5;
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #1a1a1a;
+        --text-color: #e0e0e0;
+        --border-color: #444;
+        --primary-color: #2b90d9;
+        --primary-hover: #3aa0e9;
+        --container-bg: #2a2a2a;
+        --code-bg: #333;
+        --blockquote-color: #aaa;
+        --table-header-bg: #333;
+    }
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    padding: 20px;
+}
+
+h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: var(--text-color);
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.view {
+    width: 100%;
+}
+
+/* Login view */
+#login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+    max-width: 500px;
+}
+
+#login-form input {
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 16px;
+    width: 100%;
+    background-color: var(--container-bg);
+    color: var(--text-color);
+}
+
+#login-form button {
+    padding: 12px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#login-form button:hover {
+    background-color: var(--primary-hover);
+}
+
+.token-help {
+    margin-top: 10px;
+    font-size: 14px;
+    color: var(--blockquote-color);
+}
+
+/* Editor view */
+#editor-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+#post-button {
+    padding: 10px 20px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#post-button:hover {
+    background-color: var(--primary-hover);
+}
+
+#view-mode-toggle {
+    margin-left: auto;
+    display: flex;
+    gap: 15px;
+}
+
+#view-mode-toggle label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    color: var(--text-color);
+}
+
+#view-mode-toggle input[type="radio"] {
+    margin: 0;
+}
+
+/* Editor container */
+#editor-container {
+    width: 100%;
+    height: calc(100vh - 150px);
+    min-height: 400px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--container-bg);
+    overflow: hidden;
+}
+
+/* Vertical mode (stacked - editor on top, preview below) */
+#editor-container.vertical-mode {
+    display: flex;
+    flex-direction: column;
+}
+
+#editor-container.vertical-mode #editor-tab {
+    height: 70%;
+    border-bottom: 1px solid var(--border-color);
+}
+
+#editor-container.vertical-mode #preview-tab {
+    height: 30%;
+}
+
+/* Horizontal mode (side by side - editor on left, preview on right) */
+#editor-container.horizontal-mode {
+    display: flex;
+    flex-direction: row;
+}
+
+#editor-container.horizontal-mode #editor-tab {
+    width: 50%;
+    border-right: 1px solid var(--border-color);
+}
+
+#editor-container.horizontal-mode #preview-tab {
+    width: 50%;
+}
+
+/* Editor and preview */
+#editor-tab, #preview-tab {
+    overflow: auto;
+}
+
+#editor {
+    width: 100%;
+    height: 100%;
+    border: none;
+    resize: none;
+    padding: 15px;
+    font-family: monospace;
+    font-size: 16px;
+    line-height: 1.5;
+    outline: none;
+    background-color: var(--container-bg);
+    color: var(--text-color);
+}
+
+#preview {
+    height: 100%;
+    padding: 15px;
+    overflow: auto;
+    color: var(--text-color);
+}
+
+/* Markdown styles */
+#preview h1 {
+    font-size: 24px;
+    margin-top: 0;
+    margin-bottom: 16px;
+}
+
+#preview h2 {
+    font-size: 20px;
+    margin-top: 24px;
+    margin-bottom: 16px;
+}
+
+#preview h3 {
+    font-size: 18px;
+    margin-top: 24px;
+    margin-bottom: 16px;
+}
+
+#preview p {
+    margin-bottom: 16px;
+}
+
+#preview ul, #preview ol {
+    margin-bottom: 16px;
+    padding-left: 24px;
+}
+
+#preview li {
+    margin-bottom: 8px;
+}
+
+#preview code {
+    font-family: monospace;
+    background-color: var(--code-bg);
+    padding: 2px 4px;
+    border-radius: 3px;
+}
+
+#preview pre {
+    background-color: var(--code-bg);
+    padding: 16px;
+    border-radius: 4px;
+    overflow: auto;
+    margin-bottom: 16px;
+}
+
+#preview blockquote {
+    border-left: 4px solid var(--border-color);
+    padding-left: 16px;
+    color: var(--blockquote-color);
+    margin-bottom: 16px;
+}
+
+#preview img {
+    max-width: 100%;
+    height: auto;
+}
+
+#preview table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 16px;
+}
+
+#preview th, #preview td {
+    border: 1px solid var(--border-color);
+    padding: 8px;
+    text-align: left;
+}
+
+#preview th {
+    background-color: var(--table-header-bg);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-color);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--blockquote-color);
+}

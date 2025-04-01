@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FuckPost</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <main>
+        <!-- Login View -->
+        <section id="login-view" class="view">
+            <h1>FuckPost</h1>
+            <form id="login-form">
+                <input type="text" id="instance-url" placeholder="mastodon.social" required>
+                <input type="password" id="access-token" placeholder="Access Token" required>
+                <button type="submit" id="login-button">Login</button>
+            </form>
+            <p class="token-help">Get your access token from your Mastodon instance's settings page.</p>
+        </section>
+        
+        <!-- Editor View -->
+        <section id="editor-view" class="view" style="display:none;">
+            <h1>FuckPost</h1>
+            
+            <div id="editor-controls">
+                <button id="post-button">Post</button>
+                <div id="view-mode-toggle">
+                    <label>
+                        <input type="radio" name="view-mode" value="vertical" checked> Stacked
+                    </label>
+                    <label>
+                        <input type="radio" name="view-mode" value="horizontal"> Side by Side
+                    </label>
+                </div>
+            </div>
+            
+            <div id="editor-container" class="vertical-mode">
+                <div id="editor-tab" class="tab active">
+                    <textarea id="editor" placeholder="Write your post here..."></textarea>
+                </div>
+                <div id="preview-tab" class="tab">
+                    <div id="preview"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
