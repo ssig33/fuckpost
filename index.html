@@ -13,10 +13,9 @@
             <h1>FuckPost</h1>
             <form id="login-form">
                 <input type="text" id="instance-url" placeholder="mastodon.social" required>
-                <input type="password" id="access-token" placeholder="Access Token" required>
-                <button type="submit" id="login-button">Login</button>
+                <button type="submit" id="login-button">Connect to Instance</button>
             </form>
-            <p class="token-help">Get your access token from your Mastodon instance's settings page.</p>
+            <p class="token-help">You will be redirected to your Mastodon instance to authorize this application.</p>
         </section>
         
         <!-- Editor View -->
@@ -42,6 +41,10 @@
                 <div id="preview-tab" class="tab">
                     <div id="preview"></div>
                 </div>
+            </div>
+            
+            <div id="logout-container">
+                <button id="logout-button">Logout</button>
             </div>
         </section>
     </main>

@@ -37,25 +37,28 @@ The application follows a modular architecture with these main components:
 ## Authentication Flow
 
 1. User enters their Mastodon instance URL (e.g., "mastodon.social")
-2. User enters their access token (obtained from their Mastodon instance settings)
-3. Application stores the token and instance URL in localStorage
-4. Application proceeds to the editor interface
+2. Application registers with the Mastodon instance using the `/api/v1/apps` endpoint
+3. User is redirected to their Mastodon instance to authorize the application
+4. After authorization, the user is redirected back with an authorization code
+5. Application exchanges the code for an access token using OAuth 2.0 Authorization Code Flow
+6. Application stores the token and instance URL in localStorage
+7. Application proceeds to the editor interface
 
 ## User Interface
 
 The UI consists of these main screens:
 
-1. **Login Screen**: 
+1. **Login Screen**:
    - Instance URL input field
-   - Access token input field
-   - Login button
-   - Help text for obtaining access token
+   - Connect button
+   - Help text explaining the authorization process
 
-2. **Editor Screen**: 
+2. **Editor Screen**:
    - Large text area for post composition
    - Preview area (stacked or side by side)
    - Toggle for preview mode
    - Post button
+   - Logout button
 
 ## Draft Management System
 

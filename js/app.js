@@ -13,10 +13,18 @@ const DEFAULT_STORAGE = {
   },
 };
 
+// App configuration
+const APP_NAME = "FuckPost";
+const APP_WEBSITE = window.location.origin;
+const APP_REDIRECT_URI = window.location.href;
+const APP_SCOPES = "read write";
+
 // App state
 let appState = {
   instance: null,
   token: null,
+  client_id: null,
+  client_secret: null,
   storage: { ...DEFAULT_STORAGE },
 };
 
@@ -30,6 +38,7 @@ const editorContainer = document.getElementById("editor-container");
 const editor = document.getElementById("editor");
 const preview = document.getElementById("preview");
 const postButton = document.getElementById("post-button");
+const logoutButton = document.getElementById("logout-button");
 const viewModeRadios = document.querySelectorAll('input[name="view-mode"]');
 const editorTab = document.getElementById("editor-tab");
 const previewTab = document.getElementById("preview-tab");
@@ -39,17 +48,21 @@ function init() {
   // Check for existing authentication
   const savedToken = localStorage.getItem("fuckpost_token");
   const savedInstance = localStorage.getItem("fuckpost_instance");
+  const savedClientId = localStorage.getItem("fuckpost_client_id");
+
+  // Set up event listeners first to handle potential auth redirects
+  setupEventListeners();
 
   if (savedToken && savedInstance) {
     appState.token = savedToken;
     appState.instance = savedInstance;
+    if (savedClientId) {
+      appState.client_id = savedClientId;
+    }
     loadEditor();
   } else {
     showLoginView();
   }
-
-  // Set up event listeners
-  setupEventListeners();
 }
 
 // Set up event listeners
@@ -58,17 +71,14 @@ function setupEventListeners() {
   loginForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const instance = instanceInput.value.trim();
-    const token = accessTokenInput.value.trim();
 
-    if (instance && token) {
-      // Store the instance and token
+    if (instance) {
+      // Store the instance
       appState.instance = instance;
-      appState.token = token;
       localStorage.setItem("fuckpost_instance", instance);
-      localStorage.setItem("fuckpost_token", token);
 
-      // Load the editor
-      loadEditor();
+      // Register the application with the instance
+      registerApplication(instance);
     }
   });
 
@@ -84,6 +94,137 @@ function setupEventListeners() {
       setViewMode(e.target.value);
     });
   });
+
+  // Logout button
+  logoutButton.addEventListener("click", logout);
+
+  // Check for access token in URL fragment after redirect
+  window.addEventListener("load", checkForAccessToken);
+}
+
+// Logout function - clear localStorage and reload the page
+function logout() {
+  // Clear all FuckPost related items from localStorage
+  localStorage.removeItem("fuckpost_token");
+  localStorage.removeItem("fuckpost_instance");
+  localStorage.removeItem("fuckpost_client_id");
+  localStorage.removeItem("fuckpost_client_secret");
+  localStorage.removeItem(STORAGE_KEY);
+
+  // Reload the page to reset the application state
+  window.location.reload();
+}
+
+// Register the application with the Mastodon instance
+async function registerApplication(instance) {
+  try {
+    const response = await fetch(`https://${instance}/api/v1/apps`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        client_name: APP_NAME,
+        redirect_uris: APP_REDIRECT_URI,
+        scopes: APP_SCOPES,
+        website: APP_WEBSITE,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("Application registered:", data);
+
+    // Store the client_id and client_secret
+    appState.client_id = data.client_id;
+    appState.client_secret = data.client_secret;
+    localStorage.setItem("fuckpost_client_id", data.client_id);
+    localStorage.setItem("fuckpost_client_secret", data.client_secret);
+
+    // Redirect to authorization page
+    redirectToAuth(instance, data.client_id);
+  } catch (error) {
+    console.error("Error registering application:", error);
+    alert(`Failed to register with instance: ${error.message}`);
+  }
+}
+
+// Redirect to the Mastodon authorization page
+function redirectToAuth(instance, clientId) {
+  const authUrl = new URL(`https://${instance}/oauth/authorize`);
+
+  authUrl.searchParams.append("client_id", clientId);
+  authUrl.searchParams.append("redirect_uri", APP_REDIRECT_URI);
+  authUrl.searchParams.append("response_type", "code");
+  authUrl.searchParams.append("scope", APP_SCOPES);
+
+  window.location.href = authUrl.toString();
+}
+
+// Check for authorization code in URL query parameters after redirect
+function checkForAccessToken() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const code = urlParams.get("code");
+
+  if (code) {
+    // Exchange the code for an access token
+    exchangeCodeForToken(code);
+
+    // Clear the query parameters from the URL
+    history.replaceState(null, null, window.location.pathname);
+  }
+}
+
+// Exchange the authorization code for an access token
+async function exchangeCodeForToken(code) {
+  try {
+    const instance =
+      appState.instance || localStorage.getItem("fuckpost_instance");
+    const clientId =
+      appState.client_id || localStorage.getItem("fuckpost_client_id");
+    const clientSecret =
+      appState.client_secret || localStorage.getItem("fuckpost_client_secret");
+
+    if (!instance || !clientId || !clientSecret) {
+      throw new Error("Missing authentication information");
+    }
+
+    const response = await fetch(`https://${instance}/oauth/token`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        client_id: clientId,
+        client_secret: clientSecret,
+        redirect_uri: APP_REDIRECT_URI,
+        grant_type: "authorization_code",
+        code: code,
+        scope: APP_SCOPES,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("Token exchange successful:", data);
+
+    // Store the token
+    appState.token = data.access_token;
+    localStorage.setItem("fuckpost_token", data.access_token);
+
+    // リロードして新しい認証情報で初期化
+    window.location.reload();
+  } catch (error) {
+    console.error("Error exchanging code for token:", error);
+    alert(`Failed to get access token: ${error.message}`);
+    showLoginView();
+  }
 }
 
 // Show login view
